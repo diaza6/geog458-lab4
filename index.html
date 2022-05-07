@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Map Design</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet"/>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* the style of the layer control menu */
+        #menu {
+            background: #fff;
+            position: absolute;
+            z-index: 1;
+            top: 10px;
+            right: 10px;
+            border-radius: 3px;
+            width: 120px;
+            border: 1px solid rgba(0, 0, 0, 0.4);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        /* each layer on the menu */
+        #menu a {
+            font-size: 13px;
+            color: #404040;
+            display: block;
+            margin: 0;
+            padding: 0;
+            padding: 10px;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+            text-align: center;
+        }
+
+        /* the last item of the layer items will not include a seperator */
+        #menu a:last-child {
+            border: none;
+        }
+
+        /* change color and background color while a pointer is on an hybrid link. */
+        #menu a:hover {
+            background-color: #f8f8f8;
+            color: #404040;
+        }
+
+        #menu a.active {
+            background-color: #3887be;
+            color: #ffffff;
+        }
+
+        #menu a.active:hover {
+            background: #3074a4;
+        }
+    </style>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
+</head>
+
+<body>
+    <nav id="menu">
+        <a id="modified" href="#" class>modified basemap</a>
+        <a id="police" href="#" class>seattle police stations</a>
+        <a id="police-modified" href="#" class>seattle police stations + modified basemap</a>
+        <a id="nature" href="#" class>Nature</a>
+    </nav>
+    <div id="map" class="mapboxgl-map"><div class="mapboxgl-canary" style="visibility: hidden;"></div>
+    <div class="mapboxgl-canvas-container mapboxgl-interactive mapboxgl-touch-drag-pan mapboxgl-touch-zoom-rotate">
+        <canvas class="mapboxgl-canvas" tabindex="0" aria-label="Map" role="region" style="width: 1536px; height: 711.2px;" width="1920" height="890">
+        </canvas>
+    </div>
+    <div class="mapboxgl-control-container">
+        <div class="mapboxgl-ctrl-top-left"></div>
+        <div class="mapboxgl-ctrl-top-right"></div>
+        <div class="mapboxgl-ctrl-bottom-left">
+            <div class="mapboxgl-ctrl" style="display: block;">
+                <a class="mapboxgl-ctrl-logo" target="_blank" rel="noopener nofollow" href="https://www.mapbox.com/" aria-label="Mapbox logo"></a>
+            </div>
+        </div>
+        <div class="mapboxgl-ctrl-bottom-right">
+            <div class="mapboxgl-ctrl mapboxgl-ctrl-attrib">
+                <button class="mapboxgl-ctrl-attrib-button" type="button" aria-label="Toggle attribution">
+                    <span class="mapboxgl-ctrl-icon" aria-hidden="true" title="Toggle attribution"></span>
+                </button><div class="mapboxgl-ctrl-attrib-inner" role="list">
+                    <a href="https://www.mapbox.com/about/maps/" target="_blank" title="Mapbox" aria-label="Mapbox" role="listitem">© Mapbox</a>
+                    <a href="https://www.openstreetmap.org/about/" target="_blank" title="OpenStreetMap" aria-label="OpenStreetMap" role="listitem">© OpenStreetMap</a> <a class="mapbox-improve-map" href="https://apps.mapbox.com/feedback/?owner=mapbox&amp;id=dark-v10&amp;access_token=pk.eyJ1IjoiamFrb2J6aGFvIiwiYSI6ImNpcms2YWsyMzAwMmtmbG5icTFxZ3ZkdncifQ.P9MBej1xacybKcDN_jehvw" target="_blank" aria-label="Map feedback" role="listitem" rel="noopener nofollow">Improve this map</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <script type="text/javascript">
+        mapboxgl.accessToken =
+            'pk.eyJ1IjoiZGlhemE2IiwiYSI6ImNrcDV2Y3p1MTIxY3Ayd3Rhb283bHhzNmEifQ.cer1uigaGzrwAjG32uN37Q';
+        let map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/dark-v10',
+            zoom: 11,
+            center: [-122.32892, 47.60009]
+        });
+
+        map.on('load', () => {
+
+            map.addSource('basemap-tiles', {
+                'type': 'raster',
+                'tiles': [
+                    'tiles/tileset-1/{z}/{x}/{y}.png'
+                ],
+                'tileSize': 256,
+                'attribution': 'Map tiles designed by Angel Diaz</a>'
+            });
+
+            map.addSource('police-tiles', {
+                'type': 'raster',
+                'tiles': [
+                    'tiles/police-stations/{z}/{x}/{y}.png'
+                ],
+                'tileSize': 256,
+                'attribution': 'Map tiles designed by Angel Diaz'
+            });
+
+            map.addSource('together-tiles', {
+                'type': 'raster',
+                'tiles': [
+                    'tiles/police-stations-basemap/{z}/{x}/{y}.png'
+                ],
+                'tileSize': 256,
+                'attribution': 'Map tiles designed by Angel Diaz'
+            });
+
+            map.addSource('nature-tiles', {
+                'type': 'raster',
+                'tiles': [
+                    'tiles/nature/{z}/{x}/{y}.png'
+                ],
+                'tileSize': 256,
+                'attribution': 'Map tiles designed by Angel Diaz'
+            });
+
+            map.addLayer({
+                'id': 'titleset-1',
+                'type': 'raster',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'source': 'basemap-tiles'
+            });
+
+            map.addLayer({
+                'id': 'police',
+                'type': 'raster',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'source': 'police-tiles'
+            });
+
+            map.addLayer({
+                'id': 'police-modified',
+                'type': 'raster',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'source': 'together-tiles'
+            });
+
+            map.addLayer({
+                'id': 'nature',
+                'type': 'raster',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'source': 'nature-tiles'
+            });
+
+        });
+
+        map.on('idle', () => {
+            if (!map.getLayer('modified') || !map.getLayer('police') || !map.getLayer('police-modified') || !map.getLayer('nature')) {
+                return;
+            }
+
+            const toggleableLayerIds = ['modified', 'police', 'police-modified', 'nature'];
+
+            for (const id of toggleableLayerIds) {
+                if (document.getElementById(id)) {
+                    continue;
+                }
+
+                const link = document.createElement('a');
+                link.id = id;
+                link.href = '#';
+                link.textContent = id;
+                link.className = 'inactive';
+
+                link.onclick = function (e) {
+                    const clickedLayer = this.textContent;
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const visibility = map.getLayoutProperty(
+                        clickedLayer,
+                        'visibility'
+                    );
+
+                    if (visibility === 'visible') {
+                        map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                        this.className = '';
+                    } else {
+                        this.className = 'active';
+                        map.setLayoutProperty(
+                            clickedLayer,
+                            'visibility',
+                            'visible'
+                        );
+                    }
+                };
+
+                const layers = document.getElementById('menu');
+                layers.appendChild(link);
+            }
+        });
+    </script>
+
+
+</body></html>
